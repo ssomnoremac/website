@@ -310,7 +310,8 @@ You can create a connection type to paginate by with:
 
 This will automatically define two new types: `:location_connection` and `:location_edge`.
 
-We define a field that uses these types to paginate associated records by using connection field. Here, for instance, we support paginating a business’s locations:
+We define a field that uses these types to paginate associated records by using 
+`connection field`. Here, for instance, we support paginating a business’s locations:
 
 ```
 # description: somewhere in types.ex
