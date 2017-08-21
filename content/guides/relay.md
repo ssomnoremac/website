@@ -300,5 +300,59 @@ node IDs as they are opaque values and it's the more conventional practice.
 
 ## Connections
 
+One of the more popular features of Relay is the rich pagination support provided by its
+connections. [This medium post](https://dev-blog.apollodata.com/explaining-graphql-connections-c48b7c3d6976)
+has a good explaination of the full feature set and nomenclature.
+
+You can create a connection type to paginate by with:
+
+`connection node_type: :location`
+
+This will automatically define two new types: `:location_connection` and `:location_edge`.
+
+We define a field that uses these types to paginate associated records by using connection field. Here, for instance, we support paginating a business’s locations:
+
+```
+# description: somewhere in types.ex
+
+object :business do
+  field :short_name, :string
+  connection field :locations, node_type: :location do
+    resolve fn
+      pagination_args, %{source: business} ->
+        Location
+        |> where(business_id: ^business.id)
+        |> order_by(:inserted_at)
+        |> Connection.from_query(&Repo.all/1, pagination_args)
+    end
+  end
+end
+```
+
+We are piping a query for the associated locations into `from_query/3` along with the default
+relay pagination arguments that allow for pagination. For example, to get just the first 10
+locations, use the `first` argument:
+
+```
+query{
+  business{
+    shortName
+    locations(first:10){
+      edges{
+        node{
+          address1
+          city
+        }
+      }
+    }
+  }
+}
+```
+    
 Check the [documentation](https://hexdocs.pm/absinthe_relay/Absinthe.Relay.Connection.html)
-for details on connections.
+for more details on connections.
+
+<p class="notice">
+  <strong>Note:</strong> These features do not require using Relay on the client as Apollo
+  and other client implementations generally support Relay connection configuration.
+</p>
