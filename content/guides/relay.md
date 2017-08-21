@@ -335,7 +335,7 @@ locations, use the `first` argument:
 
 ```
 query{
-  business{
+  business(id:"9ea6605e-e6c8-44ea-98d0-1fe6276e193d"){
     shortName
     locations(first:10){
       edges{
